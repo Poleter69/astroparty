@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Celestial Compact — Discord Astrology Server Manifesto</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="A community built under the same sky. Explore the manifesto of The Celestial Compact — a sanctuary for astrologers, seekers, and the cosmos.">
+  <meta name="keywords" content="astrology, discord server, manifesto, horoscope, zodiac, celestial, threejs, 3d design">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --color-bg: #0a0914;
+      --color-gold: #c9a84c;
+      --color-gold-hover: #e5c365;
+      --color-purple: #9b8ec4;
+      --color-muted: #8a85a5;
+      --color-white: #ffffff;
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(201, 168, 76, 0.2);
+      border-radius: 4px;
+      border: 2px solid var(--color-bg);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-gold);
+    }
+
+    /* Floating Header */
+    .main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.5rem 2rem;
+      z-index: 10;
+      background: linear-gradient(to bottom, rgba(10, 9, 20, 0.8) 0%, rgba(10, 9, 20, 0) 100%);
+      backdrop-filter: blur(2px);
+      pointer-events: none;
+    }
+
+    .header-container {
+      max-w: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--color-gold);
+      text-shadow: 0 0 10px rgba(201, 168, 76, 0.3);
+      pointer-events: auto;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .logo:hover {
+      color: var(--color-gold-hover);
+    }
+
+    .glow-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--color-gold);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--color-gold);
+      position: relative;
+      animation: glowPulse 2s infinite alternate;
+    }
+
+    @keyframes glowPulse {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.6;
+        box-shadow: 0 0 6px var(--color-gold);
+      }
+      100% {
+        transform: scale(1.2);
+        opacity: 1;
+        box-shadow: 0 0 18px var(--color-gold);
+      }
+    }
+
+    /* 3D Background Canvas */
+    #hero-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    /* Hero Content section overlay */
+    .hero-section {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 1.5rem;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      pointer-events: auto;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--color-white);
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.1), 0 0 15px rgba(201, 168, 76, 0.2);
+      margin-bottom: 0.75rem;
+      opacity: 0;
+      transform: translateY(40px);
+      animation: fadeUp 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 400;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--color-gold);
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeIn 1s ease 1.5s forwards;
+      pointer-events: auto;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .scroll-indicator svg {
+      width: 20px;
+      height: 20px;
+      margin-top: 0.75rem;
+      fill: var(--color-gold);
+      animation: bounce 2s infinite;
+      transition: filter 0.3s ease;
+    }
+
+    .scroll-indicator:hover svg {
+      filter: drop-shadow(0 0 8px var(--color-gold));
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 0.8; }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-8px);
+      }
+      60% {
+        transform: translateY(-4px);
+      }
+    }
+
+    /* Manifesto Sections Block wrapper */
+    .content-wrapper {
+      position: relative;
+      background-color: var(--color-bg);
+      z-index: 3;
+      padding: 6rem 1.5rem;
+      box-shadow: 0 -30px 50px rgba(10, 9, 20, 0.95);
+      border-top: 1px solid rgba(201, 168, 76, 0.1);
+    }
+
+    .section-container {
+      max-w: 800px;
+      margin: 0 auto;
+      padding: 2rem 0;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 500;
+      color: var(--color-gold);
+      margin-bottom: 3.5rem;
+      text-align: center;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 15px rgba(201, 168, 76, 0.2);
+    }
+
+    /* Bullet items */
+    .bullet-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .bullet-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+
+    .bullet-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(201, 168, 76, 0.05);
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      color: var(--color-gold);
+      font-size: 1.25rem;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(201, 168, 76, 0.1);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bullet-item:hover .bullet-badge {
+      background: var(--color-gold);
+      color: var(--color-bg);
+      border-color: var(--color-gold);
+      box-shadow: 0 0 22px rgba(201, 168, 76, 0.4);
+      transform: scale(1.08) rotate(12deg);
+    }
+
+    .bullet-text {
+      font-family: var(--font-body);
+      font-size: 1.15rem;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.85);
+      padding-top: 0.4rem;
+    }
+
+    .bullet-text span.dash {
+      color: var(--color-gold);
+      opacity: 0.6;
+      margin: 0 0.5rem;
+    }
+
+    .bullet-text span.highlight {
+      color: var(--color-purple);
+      font-weight: 400;
+    }
+
+    /* Section dividers */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8rem auto;
+      max-w: 600px;
+    }
+
+    .section-divider::before, .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(201, 168, 76, 0.25) 50%, transparent);
+    }
+
+    .section-divider::before {
+      margin-right: 1.5rem;
+    }
+
+    .section-divider::after {
+      margin-left: 1.5rem;
+    }
+
+    .divider-star {
+      color: var(--color-gold);
+      font-size: 1.2rem;
+      text-shadow: 0 0 8px rgba(201, 168, 76, 0.5);
+      user-select: none;
+    }
+
+    /* Floating Orrery Section */
+    .orrery-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 6rem auto;
+      text-align: center;
+    }
+
+    .orrery-canvas-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #orrery-canvas {
+      width: 400px;
+      height: 400px;
+      display: block;
+      cursor: pointer;
+      background: transparent;
+      outline: none;
+    }
+
+    .orrery-label {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-top: 1.5rem;
+      position: relative;
+    }
+
+    .orrery-label::after {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background-color: var(--color-gold);
+      margin: 0.6rem auto 0;
+      opacity: 0.4;
+    }
+
+    /* Scroll reveal transitions */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.reveal-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* The Oath Scroll block */
+    .oath-container {
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      padding: 6rem 3rem;
+      background-color: rgba(10, 9, 20, 0.95);
+      background-image: 
+        radial-gradient(rgba(201, 168, 76, 0.15) 1.2px, transparent 1.2px),
+        radial-gradient(rgba(155, 142, 196, 0.12) 1.2px, transparent 1.2px);
+      background-size: 36px 36px;
+      background-position: 0 0, 18px 18px;
+      border-radius: 12px;
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.6), 
+        0 0 35px rgba(201, 168, 76, 0.04),
+        inset 0 0 40px rgba(0, 0, 0, 0.9);
+      max-w: 750px;
+      margin: 8rem auto;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .oath-container::before {
+      content: '✦';
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      color: var(--color-gold);
+      font-size: 0.9rem;
+      opacity: 0.5;
+    }
+
+    .oath-container::after {
+      content: '✦';
+      position: absolute;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      color: var(--color-gold);
+      font-size: 0.9rem;
+      opacity: 0.5;
+    }
+
+    .oath-text {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 500;
+      line-height: 2.3;
+      color: var(--color-white);
+      white-space: pre-line;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.08);
+      letter-spacing: 0.02em;
+    }
+
+    .oath-text span.gold {
+      color: var(--color-gold);
+      text-shadow: 0 0 10px rgba(201, 168, 76, 0.3);
+    }
+
+    /* CTA bottom action */
+    .cta-container {
+      display: flex;
+      justify-content: center;
+      margin: 6rem 0 3rem;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 1.1rem 3.5rem;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #0a0914;
+      background: var(--color-gold);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 20px rgba(201, 168, 76, 0.3);
+      position: relative;
+      animation: pulseGlow 2.5s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.5);
+      }
+      70% {
+        box-shadow: 0 0 0 15px rgba(201, 168, 76, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(201, 168, 76, 0);
+      }
+    }
+
+    .cta-button:hover {
+      transform: translateY(-4px);
+      background: var(--color-white);
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.25), 0 0 20px rgba(201, 168, 76, 0.1);
+      color: var(--color-bg);
+      animation: none;
+    }
+
+    /* Interactive 2D Projected Tooltip */
+    .zodiac-tooltip {
+      position: fixed;
+      background: rgba(12, 11, 22, 0.92);
+      border: 1px solid rgba(201, 168, 76, 0.35);
+      border-radius: 8px;
+      padding: 1.2rem 1.6rem;
+      color: var(--color-white);
+      font-family: var(--font-body);
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -120%) scale(0.92);
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.5), 
+        0 0 25px rgba(155, 142, 196, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      width: 250px;
+      text-align: center;
+    }
+
+    .zodiac-tooltip.active {
+      opacity: 1;
+      transform: translate(-50%, -120%) scale(1);
+    }
+
+    .zodiac-tooltip .tooltip-glyph {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      color: var(--color-gold);
+      margin-bottom: 0.2rem;
+      text-shadow: 0 0 12px rgba(201, 168, 76, 0.4);
+    }
+
+    .zodiac-tooltip .tooltip-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      color: var(--color-white);
+    }
+
+    .zodiac-tooltip .tooltip-keywords {
+      font-size: 0.8rem;
+      color: var(--color-muted);
+      line-height: 1.4;
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    .zodiac-tooltip .tooltip-arrow {
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: rgba(12, 11, 22, 0.92);
+      border-right: 1px solid rgba(201, 168, 76, 0.35);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.35);
+    }
+
+    /* Footer styling */
+    .main-footer {
+      text-align: center;
+      padding: 4rem 1.5rem 6rem;
+      background-color: var(--color-bg);
+      border-top: 1px solid rgba(201, 168, 76, 0.05);
+    }
+
+    .footer-divider {
+      width: 40px;
+      height: 1px;
+      background-color: rgba(201, 168, 76, 0.2);
+      margin: 0 auto 1.5rem;
+    }
+
+    .footer-text {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: var(--color-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* Responsive adjustments */
+    @media (max-w: 768px) {
+      .hero-title {
+        font-size: 2.6rem;
+      }
+      .hero-tagline {
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+      }
+      .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 2.5rem;
+      }
+      .bullet-text {
+        font-size: 1rem;
+      }
+      .bullet-badge {
+        width: 40px;
+        height: 40px;
+        font-size: 1.05rem;
+      }
+      .orrery-canvas-container, #orrery-canvas {
+        width: 300px;
+        height: 300px;
+      }
+      .oath-container {
+        padding: 4rem 1.5rem;
+        margin: 4rem 0.5rem;
+      }
+      .oath-text {
+        font-size: 1.15rem;
+        line-height: 2;
+      }
+      .cta-button {
+        padding: 1rem 2.8rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Navigation Header -->
+  <header class="main-header">
+    <div class="header-container">
+      <a href="#" class="logo">THE CELESTIAL COMPACT</a>
+      <div class="glow-dot" id="header-status" title="Cosmos Status: Connected"></div>
+    </div>
+  </header>
+
+  <!-- Full-screen Background canvas -->
+  <canvas id="hero-canvas"></canvas>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">The Celestial Compact</h1>
+      <p class="hero-tagline">A Discord astrology server manifesto</p>
+    </div>
+    <a href="#manifesto" class="scroll-indicator" id="scroll-btn">
+      <span>Scroll to enter</span>
+      <svg viewBox="0 0 24 24">
+        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+      </svg>
+    </a>
+  </section>
+
+  <!-- Interactive 2D Projected Tooltip -->
+  <div id="zodiac-tooltip" class="zodiac-tooltip">
+    <div class="tooltip-arrow"></div>
+    <div class="tooltip-glyph" id="tooltip-glyph">♈</div>
+    <div class="tooltip-title" id="tooltip-title">Aries</div>
+    <div class="tooltip-keywords" id="tooltip-keywords">bold · pioneering · impulsive</div>
+  </div>
+
+  <!-- Content Block Wrapper -->
+  <div class="content-wrapper" id="manifesto">
+    
+    <!-- Section 1: Who we are -->
+    <section class="section-container reveal">
+      <h2 class="section-title">✦ Who we are</h2>
+      <div class="bullet-list">
+        
+        <div class="bullet-item">
+          <div class="bullet-badge">☽</div>
+          <div class="bullet-text">
+            A community built under <span class="highlight">the same sky</span><span class="dash">—</span>every timezone, every sign, every tradition
+          </div>
+        </div>
+
+        <div class="bullet-item">
+          <div class="bullet-badge">☉</div>
+          <div class="bullet-text">
+            Believers, skeptics, and the curious <span class="highlight">all welcome</span><span class="dash">—</span>wonder is enough
+          </div>
+        </div>
+
+        <div class="bullet-item">
+          <div class="bullet-badge">♃</div>
+          <div class="bullet-text">
+            Expansive like <span class="highlight">Jupiter</span><span class="dash">—</span>memes, placements, 3am transit freakouts, all welcome
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Center Divider -->
+    <div class="section-divider">
+      <span class="divider-star">✦</span>
+    </div>
+
+    <!-- 3D Accent Section: Orrery -->
+    <section class="orrery-section reveal">
+      <div class="orrery-canvas-container">
+        <canvas id="orrery-canvas"></canvas>
+      </div>
+      <p class="orrery-label">the cosmic order</p>
+    </section>
+
+    <!-- Center Divider -->
+    <div class="section-divider">
+      <span class="divider-star">✦</span>
+    </div>
+
+    <!-- Section 2: What we believe -->
+    <section class="section-container reveal">
+      <h2 class="section-title">✦ What we believe</h2>
+      <div class="bullet-list">
+
+        <div class="bullet-item">
+          <div class="bullet-badge">♈</div>
+          <div class="bullet-text">
+            No sign is <span class="highlight">cursed</span>, no placement is a personality flaw
+          </div>
+        </div>
+
+        <div class="bullet-item">
+          <div class="bullet-badge">♀</div>
+          <div class="bullet-text">
+            Your chart is <span class="highlight">sacred</span>, not a weapon<span class="dash">—</span>we use astrology to understand, not judge
+          </div>
+        </div>
+
+        <div class="bullet-item">
+          <div class="bullet-badge">☿</div>
+          <div class="bullet-text">
+            Curiosity over <span class="highlight">certainty</span><span class="dash">—</span>healthy debate is cosmic growth
+          </div>
+        </div>
+
+        <div class="bullet-item">
+          <div class="bullet-badge">♄</div>
+          <div class="bullet-text">
+            Honesty with <span class="highlight">kindness</span><span class="dash">—</span>Saturn demands accountability, not cruelty
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Center Divider -->
+    <div class="section-divider">
+      <span class="divider-star">✦</span>
+    </div>
+
+    <!-- Section 3: How we show up -->
+    <section class="section-container reveal">
+      <h2 class="section-title">✦ How we show up</h2>
+      <div class="bullet-list">
+
+        <div class="bullet-item">
+          <div class="bullet-badge">★</div>
+          <div class="bullet-text">
+            Hype the <span class="highlight">big transits</span><span class="dash">—</span>Jupiter return? We celebrate
+          </div>
+        </div>
+
+        <div class="bullet-item">
+          <div class="bullet-badge">☽</div>
+          <div class="bullet-text">
+            Hold space for <span class="highlight">the hard ones</span><span class="dash">—</span>Saturn returns, dark nights of the soul
+          </div>
+        </div>
+
+        <div class="bullet-item">
+          <div class="bullet-badge">♆</div>
+          <div class="bullet-text">
+            Share <span class="highlight">generously</span><span class="dash">—</span>resources, readings, knowledge flow freely here
+          </div>
+        </div>
+
+        <div class="bullet-item">
+          <div class="bullet-badge">♂</div>
+          <div class="bullet-text">
+            Bring the <span class="highlight">energy</span> you wish to receive
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Center Divider -->
+    <div class="section-divider">
+      <span class="divider-star">✦</span>
+    </div>
+
+    <!-- The Oath Scroll container -->
+    <section class="section-container reveal">
+      <div class="oath-container">
+        <p class="oath-text">
+          I look up, <span class="gold">not down</span> on others.
+          I read charts, <span class="gold">not people's worth</span>.
+          I hold space as wide as the sky.
+          As above <span class="dash">—</span> so, beloved, below. <span class="gold">✦</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- Call To Action Button -->
+    <div class="cta-container reveal">
+      <a href="#" class="cta-button">Join the server</a>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-divider"></div>
+    <p class="footer-text">© 2026 The Celestial Compact • As above, so below</p>
+  </footer>
+
+  <!-- Three.js App Script logic -->
+  <script>
+    // Wait for fonts to load before launching Three.js scenes to avoid canvas text rendering in system font fallbacks
+    document.fonts.ready.then(function() {
+      initHeroScene();
+      initOrreryScene();
+      initUI();
+    });
+
+    // --- Core UI Code ---
+    function initUI() {
+      // Intersection Observer for scroll-triggered reveals
+      const revealElements = document.querySelectorAll('.reveal');
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.12
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-active');
+            // Once revealed, we can unobserve if we want it to stay permanent
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      revealElements.forEach(el => {
+        observer.observe(el);
+      });
+
+      // Smooth scrolling for Scroll btn
+      document.getElementById('scroll-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('manifesto').scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    // --- Hero 3D Starfield & Zodiac Scene ---
+    let heroScene, heroCamera, heroRenderer;
+    let stars, celestialSphere, celestialSphere2;
+    const sprites = [];
+    let hoveredSprite = null;
+    let activeSprite = null;
+
+    const clock = new THREE.Clock();
+    const mouse = new THREE.Vector2();
+    const raycaster = new THREE.Raycaster();
+
+    let targetCamX = 0;
+    let targetCamY = 0;
+    let currentCamX = 0;
+    let currentCamY = 0;
+
+    const zodiacSigns = [
+      { char: '♈', name: 'Aries', keywords: 'bold · pioneering · impulsive' },
+      { char: '♉', name: 'Taurus', keywords: 'grounded · patient · stubborn' },
+      { char: '♊', name: 'Gemini', keywords: 'curious · adaptable · talkative' },
+      { char: '♋', name: 'Cancer', keywords: 'intuitive · nurturing · protective' },
+      { char: '♌', name: 'Leo', keywords: 'creative · expressive · proud' },
+      { char: '♍', name: 'Virgo', keywords: 'analytical · helpful · perfectionist' },
+      { char: '♎', name: 'Libra', keywords: 'harmonious · diplomatic · indecisive' },
+      { char: '♏', name: 'Scorpio', keywords: 'passionate · intense · secretive' },
+      { char: '♐', name: 'Sagittarius', keywords: 'philosophical · adventurous · restless' },
+      { char: '♑', name: 'Capricorn', keywords: 'disciplined · ambitious · reserved' },
+      { char: '♒', name: 'Aquarius', keywords: 'progressive · independent · eccentric' },
+      { char: '♓', name: 'Pisces', keywords: 'dreamy · empathetic · escapist' }
+    ];
+
+    // Tooltip elements
+    const tooltipEl = document.getElementById('zodiac-tooltip');
+    const tooltipGlyph = document.getElementById('tooltip-glyph');
+    const tooltipTitle = document.getElementById('tooltip-title');
+    const tooltipKeywords = document.getElementById('tooltip-keywords');
+
+    function createGlyphTexture(char) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.clearRect(0, 0, 256, 256);
+      
+      // Glow settings
+      ctx.shadowColor = 'rgba(201, 168, 76, 0.7)';
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = '#ffffff';
+      
+      // Draw character
+      ctx.font = '140px "Cinzel", serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(char, 128, 128);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.minFilter = THREE.LinearFilter;
+      return texture;
+    }
+
+    function initHeroScene() {
+      const canvas = document.getElementById('hero-canvas');
+      
+      heroScene = new THREE.Scene();
+      
+      heroCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+      heroCamera.position.z = 100;
+      
+      heroRenderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+        alpha: true
+      });
+      heroRenderer.setPixelRatio(window.devicePixelRatio);
+      heroRenderer.setSize(window.innerWidth, window.innerHeight);
+
+      // 1. Generate Drift Stars (Points + BufferGeometry)
+      const starCount = 2000;
+      const starGeometry = new THREE.BufferGeometry();
+      const starPositions = new Float32Array(starCount * 3);
+
+      for (let i = 0; i < starCount * 3; i += 3) {
+        // Distribute points in a wide spherical/cubic boundary
+        starPositions[i] = (Math.random() - 0.5) * 350;
+        starPositions[i + 1] = (Math.random() - 0.5) * 350;
+        starPositions[i + 2] = (Math.random() - 0.5) * 350;
+      }
+
+      starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+      
+      const starMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.9,
+        transparent: true,
+        opacity: 0.8,
+        sizeAttenuation: true
+      });
+
+      stars = new THREE.Points(starGeometry, starMaterial);
+      heroScene.add(stars);
+
+      // 2. Wireframe Celestial Spheres
+      const sphereGeometry = new THREE.SphereGeometry(100, 18, 18);
+      const sphereMaterial = new THREE.MeshBasicMaterial({
+        color: 0x9b8ec4, // soft purple
+        wireframe: true,
+        transparent: true,
+        opacity: 0.06
+      });
+      celestialSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      heroScene.add(celestialSphere);
+
+      // Interlocking second gold sphere
+      const sphereGeometry2 = new THREE.SphereGeometry(101, 12, 12);
+      const sphereMaterial2 = new THREE.MeshBasicMaterial({
+        color: 0xc9a84c, // gold
+        wireframe: true,
+        transparent: true,
+        opacity: 0.04
+      });
+      celestialSphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial2);
+      heroScene.add(celestialSphere2);
+
+      // 3. Orbiting Zodiac Glyphs as 3D Text Sprites
+      zodiacSigns.forEach((sign, idx) => {
+        const texture = createGlyphTexture(sign.char);
+        const material = new THREE.SpriteMaterial({
+          map: texture,
+          transparent: true,
+          opacity: 0.9
+        });
+        const sprite = new THREE.Sprite(material);
+        
+        // Sprite sizing
+        sprite.scale.set(13, 13, 1);
+        
+        // Positioning values: staggered angle orbit, varying depths/heights
+        const angle = (idx / 12) * Math.PI * 2;
+        const radius = 65 + Math.random() * 15;
+        const yOffset = (Math.random() - 0.5) * 35;
+        
+        sprite.position.x = Math.cos(angle) * radius;
+        sprite.position.z = Math.sin(angle) * radius;
+        sprite.position.y = yOffset;
+        
+        sprite.userData = {
+          index: idx,
+          char: sign.char,
+          name: sign.name,
+          keywords: sign.keywords,
+          angle: angle,
+          radius: radius,
+          yOffset: yOffset
+        };
+
+        heroScene.add(sprite);
+        sprites.push(sprite);
+      });
+
+      // Events
+      window.addEventListener('resize', onWindowResize, false);
+      window.addEventListener('mousemove', onMouseMove, false);
+      window.addEventListener('pointerdown', onPointerDown, false);
+
+      // Run Loop
+      animateHero();
+    }
+
+    function animateHero() {
+      requestAnimationFrame(animateHero);
+
+      const time = clock.getElapsedTime();
+
+      // Stars rotation
+      stars.rotation.y = time * 0.008;
+      stars.rotation.x = time * 0.003;
+
+      // Celestial Spheres opposite rotations
+      celestialSphere.rotation.y = -time * 0.012;
+      celestialSphere.rotation.x = -time * 0.006;
+      celestialSphere2.rotation.y = time * 0.008;
+      celestialSphere2.rotation.z = time * 0.004;
+
+      // Orbiting Sprites bobbing & rotating
+      sprites.forEach(sprite => {
+        const data = sprite.userData;
+        const currentAngle = data.angle + time * 0.02;
+        
+        sprite.position.x = Math.cos(currentAngle) * data.radius;
+        sprite.position.z = Math.sin(currentAngle) * data.radius;
+        // Bobbing vertical height
+        sprite.position.y = data.yOffset + Math.sin(time * 0.8 + data.angle) * 3.5;
+      });
+
+      // Mouse Parallax smooth lerp
+      currentCamX += (targetCamX - currentCamX) * 0.05;
+      currentCamY += (targetCamY - currentCamY) * 0.05;
+
+      heroCamera.position.x = currentCamX;
+      heroCamera.position.y = currentCamY;
+      heroCamera.lookAt(0, 0, 0);
+
+      // Active tooltip screen tracking
+      if (activeSprite) {
+        const tempV = new THREE.Vector3();
+        activeSprite.getWorldPosition(tempV);
+        
+        // Project to screen coordinates
+        tempV.project(heroCamera);
+        const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (tempV.y * -0.5 + 0.5) * window.innerHeight;
+        
+        tooltipEl.style.left = `${x}px`;
+        tooltipEl.style.top = `${y}px`;
+      }
+
+      heroRenderer.render(heroScene, heroCamera);
+    }
+
+    // Interactive event handlers
+    function onMouseMove(event) {
+      const mx = (event.clientX / window.innerWidth) * 2 - 1;
+      const my = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      // Camera parallax target
+      targetCamX = mx * 18;
+      targetCamY = my * 18;
+
+      // Set mouse vector for raycaster
+      mouse.x = mx;
+      mouse.y = my;
+
+      // Check if mouse is over the hero area (either canvas itself or inside hero section text overlay)
+      const targetEl = event.target;
+      const isOverHero = targetEl.id === 'hero-canvas' || targetEl.closest('#hero');
+
+      if (!isOverHero) {
+        // Clear hover state and exit raycasting early to prevent intersecting hidden sprites
+        const isInteractive = targetEl.closest('.cta-button') || targetEl.closest('.logo') || targetEl.closest('#scroll-btn') || targetEl.closest('#orrery-canvas');
+        document.body.style.cursor = isInteractive ? 'pointer' : 'default';
+
+        if (hoveredSprite) {
+          hoveredSprite.scale.set(13, 13, 1);
+          hoveredSprite = null;
+        }
+        return;
+      }
+
+      // Raycast test on hover
+      raycaster.setFromCamera(mouse, heroCamera);
+      const intersects = raycaster.intersectObjects(sprites);
+
+      if (intersects.length > 0) {
+        document.body.style.cursor = 'pointer';
+        const hitSprite = intersects[0].object;
+        
+        if (hoveredSprite !== hitSprite) {
+          if (hoveredSprite) hoveredSprite.scale.set(13, 13, 1);
+          hoveredSprite = hitSprite;
+          // Scale up hovered sprite
+          hoveredSprite.scale.set(16, 16, 1);
+        }
+      } else {
+        // Let cursor be default unless hovering clickable html items
+        const isInteractive = targetEl.closest('.cta-button') || targetEl.closest('.logo') || targetEl.closest('#scroll-btn') || targetEl.closest('#orrery-canvas');
+        document.body.style.cursor = isInteractive ? 'pointer' : 'default';
+
+        if (hoveredSprite) {
+          hoveredSprite.scale.set(13, 13, 1);
+          hoveredSprite = null;
+        }
+      }
+    }
+
+    function onPointerDown(event) {
+      // Raycast only if clicking background canvas, skip if user clicks on UI overlay elements
+      if (event.target.id !== 'hero-canvas') {
+        if (!event.target.closest('#zodiac-tooltip')) {
+          hideTooltip();
+        }
+        return;
+      }
+
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, heroCamera);
+      const intersects = raycaster.intersectObjects(sprites);
+
+      if (intersects.length > 0) {
+        const hitSprite = intersects[0].object;
+        showTooltip(hitSprite.userData);
+      } else {
+        hideTooltip();
+      }
+    }
+
+    function showTooltip(userData) {
+      activeSprite = sprites[userData.index];
+      tooltipGlyph.textContent = userData.char;
+      tooltipTitle.textContent = userData.name;
+      tooltipKeywords.textContent = userData.keywords;
+      tooltipEl.classList.add('active');
+    }
+
+    function hideTooltip() {
+      activeSprite = null;
+      tooltipEl.classList.remove('active');
+    }
+
+    function onWindowResize() {
+      heroCamera.aspect = window.innerWidth / window.innerHeight;
+      heroCamera.updateProjectionMatrix();
+      heroRenderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // --- Orrery Section 3D Scene ---
+    let orreryScene, orreryCamera, orreryRenderer;
+    let orreryGroup, p1, p2, p3;
+    let orrerySpeed = 1.0;
+    let targetOrrerySpeed = 1.0;
+    const orreryClock = new THREE.Clock();
+
+    let angle1 = 0;
+    let angle2 = 0;
+    let angle3 = 0;
+
+    function initOrreryScene() {
+      const orreryCanvas = document.getElementById('orrery-canvas');
+      const rect = orreryCanvas.parentElement.getBoundingClientRect();
+      const containerSize = Math.min(rect.width, 400);
+
+      orreryScene = new THREE.Scene();
+      
+      orreryCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      orreryCamera.position.set(0, 4.5, 4.5);
+      orreryCamera.lookAt(0, 0, 0);
+
+      orreryRenderer = new THREE.WebGLRenderer({
+        canvas: orreryCanvas,
+        antialias: true,
+        alpha: true
+      });
+      orreryRenderer.setPixelRatio(window.devicePixelRatio);
+      orreryRenderer.setSize(containerSize, containerSize);
+
+      orreryGroup = new THREE.Group();
+      orreryScene.add(orreryGroup);
+
+      // Centered Solar Sun
+      const sunGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+      const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xc9a84c });
+      const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+      
+      const sunGlowGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+      const sunGlowMaterial = new THREE.MeshBasicMaterial({ color: 0xc9a84c, transparent: true, opacity: 0.25 });
+      const sunGlowMesh = new THREE.Mesh(sunGlowGeometry, sunGlowMaterial);
+      
+      orreryGroup.add(sunMesh);
+      orreryGroup.add(sunGlowMesh);
+
+      // Concentric Orbit Rings (TorusGeometry)
+      const orbitRingMaterial = new THREE.MeshBasicMaterial({
+        color: 0xc9a84c,
+        transparent: true,
+        opacity: 0.16
+      });
+
+      const o1 = new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.008, 8, 64), orbitRingMaterial);
+      o1.rotation.x = Math.PI / 2;
+      orreryGroup.add(o1);
+
+      const o2 = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.008, 8, 64), orbitRingMaterial);
+      o2.rotation.x = Math.PI / 2;
+      orreryGroup.add(o2);
+
+      const o3 = new THREE.Mesh(new THREE.TorusGeometry(2.9, 0.008, 8, 64), orbitRingMaterial);
+      o3.rotation.x = Math.PI / 2;
+      orreryGroup.add(o3);
+
+      // Spherical planet meshes (MeshBasicMaterial)
+      p1 = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0x9b8ec4 }) // Soft purple
+      );
+      orreryGroup.add(p1);
+
+      p2 = new THREE.Mesh(
+        new THREE.SphereGeometry(0.18, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0xc9a84c }) // Gold
+      );
+      orreryGroup.add(p2);
+
+      p3 = new THREE.Mesh(
+        new THREE.SphereGeometry(0.14, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0x8a85a5 }) // Secondary purple
+      );
+      orreryGroup.add(p3);
+
+      // Speed up on Hover interaction
+      orreryCanvas.addEventListener('mouseenter', () => {
+        targetOrrerySpeed = 6.0;
+      });
+      orreryCanvas.addEventListener('mouseleave', () => {
+        targetOrrerySpeed = 1.0;
+      });
+
+      // Handle Orrery resizing separately
+      window.addEventListener('resize', onOrreryResize);
+
+      // Run Loop
+      animateOrrery();
+    }
+
+    function animateOrrery() {
+      requestAnimationFrame(animateOrrery);
+
+      const delta = orreryClock.getDelta();
+      
+      // Smoothly interpolate speeds
+      orrerySpeed += (targetOrrerySpeed - orrerySpeed) * 0.06;
+
+      // Accumulate orbital angles (prevents jumping coordinates)
+      angle1 += delta * 1.5 * orrerySpeed;
+      angle2 += delta * 0.8 * orrerySpeed;
+      angle3 += delta * 0.4 * orrerySpeed;
+
+      p1.position.x = Math.cos(angle1) * 1.3;
+      p1.position.z = Math.sin(angle1) * 1.3;
+
+      p2.position.x = Math.cos(angle2) * 2.1;
+      p2.position.z = Math.sin(angle2) * 2.1;
+
+      p3.position.x = Math.cos(angle3) * 2.9;
+      p3.position.z = Math.sin(angle3) * 2.9;
+
+      // Rotate full Orrery system tilt
+      orreryGroup.rotation.y = Date.now() * 0.00008;
+      orreryGroup.rotation.x = 0.35; // isometric perspective tilt
+
+      orreryRenderer.render(orreryScene, orreryCamera);
+    }
+
+    function onOrreryResize() {
+      const orreryCanvas = document.getElementById('orrery-canvas');
+      const rect = orreryCanvas.parentElement.getBoundingClientRect();
+      const containerSize = Math.min(rect.width, 400);
+      orreryRenderer.setSize(containerSize, containerSize);
+      orreryCamera.updateProjectionMatrix();
+    }
+  </script>
+</body>
+</html>
